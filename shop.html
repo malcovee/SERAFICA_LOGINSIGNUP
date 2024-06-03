@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="products.css" media="screen" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"
+      integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"/> 
+
+</head>
+
+
+<header>
+        <ion-icon name="bonfire"></ion-icon>
+
+    <nav class="navigation">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="shop.html">Shop</a>
+    <a href="contact.html">Contact</a>
+    <button class="btnLogin-popup">Login</button>
+    </nav>
+    </header>
+
+<body>
+    
+<!-- Login Sign Up Section Start -->
+        <div class="wrapper">
+        <span class="icon-close"><ion-icon name="close-circle"></ion-icon>
+        </span>
+        
+        <div class="form-box login" id="authForm">
+            <h2>Login</h2>
+            <form action="#">
+                <div class="input-box">
+                    <span class="icon"><ion-icon name="mail"></ion-icon></span>
+                    <input type="email" id="userEmail" required>
+                    <label>Email</label>
+                </div>
+                <div class="input-box">
+                    <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
+                    <input type="password" id="userPassword" required>
+                    <label>Password</label>
+                </div>
+                <div class="remember-forgot">
+                    <label><input type="checkbox">
+                    Remember Me</label>
+                    <a href="#">Forgot Password?</a>
+                </div>
+                <button type="submit" id="signInButton" class="btn">Login</button>
+                <div class="login-register">
+                    <p>Don't have an account?
+                    <a href="#" class="register-link">Register</a></p>
+                </div>
+            </form>
+        </div>
+
+        <div class="form-box signout" id="secretContent">
+
+            <h4>You've successfully signed up.</h4>
+            <h1>Welcome aboard!</h1>
+            <br>
+            <button id="signOutButton" class="btn" >Sign Out</button>
+          </div>
+      
+        <div class="form-box register" id="authForm">
+        <h2>Registration</h2>
+        <form action="#">
+        <div class="input-box">
+        <span class="icon"><ion-icon name="mail"></ion-icon></span>
+        <input type="email" id="userEmail" required>
+        <label>Email</label>
+        </div>
+        <div class="input-box">
+        <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
+        <input type="password" id="userPassword" required>
+        <label>Password</label>
+        </div>
+        <div class="remember-forgot">
+        <label><input type="checkbox">
+        I agree to the terms & conditions</label>
+        </div>
+        <button type="submit" id="signUpButton" class="btn">Register</button>
+        <div class="login-register">
+        <p>Already have an account?
+        <a href="#" class="login-link">Login</a></p>
+    
+        </div>
+        </form>
+      
+
+        <script type="module">
+            //Update the below URL with the appropriate version if necessary.
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+            import {
+              getAuth,
+              createUserWithEmailAndPassword,
+              signInWithEmailAndPassword,
+              onAuthStateChanged,
+              signOut,
+              //Update the below URL with the appropriate version if necessary.
+            } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+      
+            // INSERT YOUR FIREBASE CONFIG OBJECT HERE
+            const firebaseConfig = {
+              apiKey: "AIzaSyBJbEm6rMTObvILOS3lIhWjLqrF4J2aBIk",
+              authDomain: "auth-fa1b7.firebaseapp.com",
+              projectId: "auth-fa1b7",
+              storageBucket: "auth-fa1b7.appspot.com",
+              messagingSenderId: "270624695799",
+              appId: "1:270624695799:web:ebc7e61edf90ef855e7af2",
+            };
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+      
+            const userEmail = document.querySelector("#userEmail");
+            const userPassword = document.querySelector("#userPassword");
+            const authForm = document.querySelector("#authForm");
+            const secretContent = document.querySelector("#secretContent");
+            const signUpButton = document.querySelector("#signUpButton");
+            const signInButton = document.querySelector("#signInButton");
+            const signOutButton = document.querySelector("#signOutButton");
+      
+            secretContent.style.display = "none";
+      
+            const userSignUp = async () => {
+              const signUpEmail = userEmail.value;
+              const signUpPassword = userPassword.value;
+              createUserWithEmailAndPassword(auth, signUpEmail, signUpPassword)
+                .then((userCredential) => {
+                  const user = userCredential.user;
+                  console.log(user);
+                  Swal.fire("Your Account is succesfully created!");
+                })
+                .catch((error) => {
+                  const errorCode = error.code;
+                  const errorMessage = error.message;
+                  console.log(errorCode + errorMessage);
+                });
+            };
+      
+            const userSignIn = async () => {
+              const signInEmail = userEmail.value;
+              const signInPassword = userPassword.value;
+              signInWithEmailAndPassword(auth, signInEmail, signInPassword)
+                .then((userCredential) => {
+                  const user = userCredential.user;
+                  Swal.fire("You have signed in successfully!");
+                })
+                .catch((error) => {
+                  const errorCode = error.code;
+                  const errorMessage = error.message;
+                  console.log(errorCode + errorMessage);
+                });
+            };
+
+            const btnPopup = document.querySelector('.btnLogin-popup');
+      
+            const checkAuthState = async () => {
+              onAuthStateChanged(auth, (user) => {
+                if (user) {
+                  // Update button text to "Sign out"
+                  document.querySelector('.btnLogin-popup').textContent = "Sign out";
+                  authForm.style.display = "none";
+                  secretContent.style.display = "block";
+                } else {
+                  document.querySelector('.btnLogin-popup').textContent = "Login";
+                  authForm.style.display = "block";
+                  secretContent.style.display = "none";
+                }
+              });
+            };
+      
+            const userSignOut = async () => {
+              await signOut(auth);
+              Swal.fire("User Logout");
+              
+            
+            };
+      
+            checkAuthState();
+      
+            signUpButton.addEventListener("click", userSignUp);
+            signInButton.addEventListener("click", userSignIn);
+            signOutButton.addEventListener("click", userSignOut);
+          </script>
+
+        </div>
+        </div>
+<!-- Login Sign Up Section End -->
+
+
+<!-- shop part -->
+
+
+<div class="header-products">
+  <h1>PRODUCTS</h1>
+</div>
+
+
+  <div class="podiv">
+    <a href="#newpopular">
+      <button>NEW & POPULAR</button>
+    </a>
+    <a href="#classic">
+      <button>CLASSIC</button>
+    </a>
+    <a href="#mo">
+      <button>MASTER ORIGINS</button>
+    </a>
+    <a href="#barista">
+      <button>BARISTA CREATIONS</button>
+    </a>
+  </div>
+  
+<section class="products" id="products">
+  <h1 class="heading" id="newpopular">NEW & POPULAR</h1>
+  <div class="box-container">
+
+<!-- product -->
+    <div class="box">
+        <div class="image">
+          <img src="PRODUCTS/1.jpg">
+          <div class="icons">
+            <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+            <a href="#"><ion-icon name="cart"></ion-icon></a>
+            <a href="#"><ion-icon name="share-social"></ion-icon></a>
+          </div>
+      </div>
+      <div class="content">
+        <h3>Cadiz</h3>
+        <div class="price">₱300</div>
+      </div>
+    </div>
+<!-- product -->
+    <div class="box">
+      <div class="image">
+        <img src="PRODUCTS/2.jpg">
+        <div class="icons">
+          <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+          <a href="#"><ion-icon name="cart"></ion-icon></a>
+          <a href="#"><ion-icon name="share-social"></ion-icon></a>
+        </div>
+    </div>
+    <div class="content">
+      <h3>Coconut Ice</h3>
+      <div class="price">₱300</div>
+    </div>
+  </div>
+<!-- product -->
+    <div class="box">
+      <div class="image">
+        <img src="PRODUCTS/ice_delicato-1.jpg">
+        <div class="icons">
+          <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+          <a href="#"><ion-icon name="cart"></ion-icon></a>
+          <a href="#"><ion-icon name="share-social"></ion-icon></a>
+        </div>
+    </div>
+    <div class="content">
+      <h3>Fred Delicato</h3>
+      <div class="price">₱300</div>
+    </div>
+  </div>
+<!-- product -->
+  <div class="box">
+    <div class="image">
+      <img src="PRODUCTS/ice_delicato-1_1.jpg">
+      <div class="icons">
+        <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+        <a href="#"><ion-icon name="cart"></ion-icon></a>
+        <a href="#"><ion-icon name="share-social"></ion-icon></a>
+      </div>
+  </div>
+  <div class="content">
+    <h3>Fred Intenso</h3>
+    <div class="price">₱300</div>
+  </div>
+  </div>
+
+  </div>
+</section>
+
+
+
+
+<section class="products" id="products">
+  <h1 class="heading" id="classic">CLASSIC</h1>
+  <div class="box-container">
+
+<!-- product -->
+    <div class="box">
+        <div class="image">
+          <img src="PRODUCTS/6.png">
+          <div class="icons">
+            <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+            <a href="#"><ion-icon name="cart"></ion-icon></a>
+            <a href="#"><ion-icon name="share-social"></ion-icon></a>
+          </div>
+      </div>
+      <div class="content">
+        <h3>Ristretto</h3>
+        <div class="price">₱300</div>
+      </div>
+    </div>
+<!-- product -->
+    <div class="box">
+      <div class="image">
+        <img src="PRODUCTS/7.png">
+        <div class="icons">
+          <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+          <a href="#"><ion-icon name="cart"></ion-icon></a>
+          <a href="#"><ion-icon name="share-social"></ion-icon></a>
+        </div>
+    </div>
+    <div class="content">
+      <h3>Stochholm Fortissio</h3>
+      <div class="price">₱300</div>
+    </div>
+  </div>
+<!-- product -->
+    <div class="box">
+      <div class="image">
+        <img src="PRODUCTS/8.png">
+        <div class="icons">
+          <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+          <a href="#"><ion-icon name="cart"></ion-icon></a>
+          <a href="#"><ion-icon name="share-social"></ion-icon></a>
+        </div>
+    </div>
+    <div class="content">
+      <h3>Ristretto Decafe</h3>
+      <div class="price">₱300</div>
+    </div>
+  </div>
+<!-- product -->
+  <div class="box">
+    <div class="image">
+      <img src="PRODUCTS/9.jpg">
+      <div class="icons">
+        <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+        <a href="#"><ion-icon name="cart"></ion-icon></a>
+        <a href="#"><ion-icon name="share-social"></ion-icon></a>
+      </div>
+  </div>
+  <div class="content">
+    <h3>Arpeggio</h3>
+    <div class="price">₱300</div>
+  </div>
+  </div>
+
+  </div>
+</section>
+
+
+<section class="products" id="products">
+  <h1 class="heading" id="mo">MASTER ORIGINS</h1>
+  <div class="box-container">
+
+<!-- product -->
+    <div class="box">
+        <div class="image">
+          <img src="PRODUCTS/A.png">
+          <div class="icons">
+            <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+            <a href="#"><ion-icon name="cart"></ion-icon></a>
+            <a href="#"><ion-icon name="share-social"></ion-icon></a>
+          </div>
+      </div>
+      <div class="content">
+        <h3>M.O. India</h3>
+        <div class="price">₱300</div>
+      </div>
+    </div>
+<!-- product -->
+    <div class="box">
+      <div class="image">
+        <img src="PRODUCTS/B.png">
+        <div class="icons">
+          <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+          <a href="#"><ion-icon name="cart"></ion-icon></a>
+          <a href="#"><ion-icon name="share-social"></ion-icon></a>
+        </div>
+    </div>
+    <div class="content">
+      <h3>M.O. Indonesia</h3>
+      <div class="price">₱300</div>
+    </div>
+  </div>
+<!-- product -->
+    <div class="box">
+      <div class="image">
+        <img src="PRODUCTS/C.png">
+        <div class="icons">
+          <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+          <a href="#"><ion-icon name="cart"></ion-icon></a>
+          <a href="#"><ion-icon name="share-social"></ion-icon></a>
+        </div>
+    </div>
+    <div class="content">
+      <h3>M.O. Nicaragua</h3>
+      <div class="price">₱300</div>
+    </div>
+  </div>
+<!-- product -->
+  <div class="box">
+    <div class="image">
+      <img src="PRODUCTS/D.png">
+      <div class="icons">
+        <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+        <a href="#"><ion-icon name="cart"></ion-icon></a>
+        <a href="#"><ion-icon name="share-social"></ion-icon></a>
+      </div>
+  </div>
+  <div class="content">
+    <h3>M.O. Colombia</h3>
+    <div class="price">₱300</div>
+  </div>
+  </div>
+  
+  </div>
+</section>
+
+
+
+
+<section class="products" id="products">
+  <h1 class="heading" id="barista">BARISTA CREATIONS</h1>
+  <div class="box-container">
+
+<!-- product -->
+    <div class="box">
+        <div class="image">
+          <img src="PRODUCTS/E.png">
+          <div class="icons">
+            <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+            <a href="#"><ion-icon name="cart"></ion-icon></a>
+            <a href="#"><ion-icon name="share-social"></ion-icon></a>
+          </div>
+      </div>
+      <div class="content">
+        <h3>Nocciola</h3>
+        <div class="price">₱300</div>
+      </div>
+    </div>
+<!-- product -->
+    <div class="box">
+      <div class="image">
+        <img src="PRODUCTS/F.png">
+        <div class="icons">
+          <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+          <a href="#"><ion-icon name="cart"></ion-icon></a>
+          <a href="#"><ion-icon name="share-social"></ion-icon></a>
+        </div>
+    </div>
+    <div class="content">
+      <h3>Scuro</h3>
+      <div class="price">₱300</div>
+    </div>
+  </div>
+<!-- product -->
+    <div class="box">
+      <div class="image">
+        <img src="PRODUCTS/G.png">
+        <div class="icons">
+          <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+          <a href="#"><ion-icon name="cart"></ion-icon></a>
+          <a href="#"><ion-icon name="share-social"></ion-icon></a>
+        </div>
+    </div>
+    <div class="content">
+      <h3>Vaniglia</h3>
+      <div class="price">₱300</div>
+    </div>
+  </div>
+<!-- product -->
+  <div class="box">
+    <div class="image">
+      <img src="PRODUCTS/H.png">
+      <div class="icons">
+        <a href="#"><ion-icon name="heart-circle"></ion-icon></a>
+        <a href="#"><ion-icon name="cart"></ion-icon></a>
+        <a href="#"><ion-icon name="share-social"></ion-icon></a>
+      </div>
+  </div>
+  <div class="content">
+    <h3>Cioccolatino</h3>
+    <div class="price">₱300</div>
+  </div>
+  </div>
+  
+  </div>
+</section>
+
+<br><br><br><br><br><br><br>
+
+<!-- Footer Start-->
+<div class="footer">
+  <div class="col-1">
+  <h3>USEFUL LINKS</h3>
+  <a href="#">Privacy Notice</a>
+  <a href="#">Terms and Conditions</a>
+  <a href="#">Cookie Preferences</a>
+</div>
+<div class="col-2">
+  <H3>NEWSLETTER</H3>
+  <form>
+  <input type="email" placeholder="Your Email Address" required>
+  <br>
+  <button class="btn" type="submit">Subscribe Now</button>
+  </form>
+</div>
+<div class="col-3">
+  <h3>CONTACT</h3>
+  <div class="footer-icons">
+    <a href="https://www.facebook.com/"><ion-icon name="logo-facebook"></ion-icon></a>
+    <a href="https://www.instagram.com/"><ion-icon name="logo-instagram"></ion-icon></a>
+    <a href="https://www.linkedin.com/"><ion-icon name="logo-linkedin"></ion-icon></a>
+    <a href="https://www.twitter.com/"><ion-icon name="logo-twitter"></ion-icon></a>
+</div>
+</div>
+</div>
+
+<div class="footer-end">
+  <p>All Rights Reserved 2024 Ivy</p>
+</div>
+
+<!-- Footer ENd-->
+          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+         <script src="script.js"> </script>
+        <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+        <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+        <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+</body>
+</html>
